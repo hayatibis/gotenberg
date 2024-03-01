@@ -1,5 +1,11 @@
+# ARG instructions do not create additional layers. Instead, next layers will
+# concatenate them. Also, we have to repeat ARG instructions in each build
+# stage that uses them.
 ARG GOLANG_VERSION
 
+# ----------------------------------------------
+# Gotenberg binary build stage
+# ----------------------------------------------
 FROM golang:$GOLANG_VERSION AS binary-stage
 
 ARG GOTENBERG_VERSION
@@ -14,6 +20,9 @@ COPY cmd ./cmd
 COPY pkg ./pkg
 RUN go build -o gotenberg -ldflags "-X 'github.com/gotenberg/gotenberg/v7/cmd.Version=$GOTENBERG_VERSION'" cmd/gotenberg/main.go
 
+# ----------------------------------------------
+# Final stage
+# ----------------------------------------------
 FROM alpine:3.19
 
 ARG GOTENBERG_VERSION

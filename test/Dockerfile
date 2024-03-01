@@ -7,7 +7,7 @@ FROM golang:$GOLANG_VERSION-bookworm AS golang
 
 # We're extending the Gotenberg's Docker image because our code relies on external
 # dependencies like Google Chrome, LibreOffice, etc.
-FROM $DOCKER_REPOSITORY/gotenberg:$GOTENBERG_VERSION
+FROM $DOCKER_REPOSITORY/gotenberg-alpine:$GOTENBERG_VERSION
 
 USER root
 
@@ -15,20 +15,20 @@ ENV GOPATH /go
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 ENV CGO_ENABLED 1
 
+COPY --from=golang /usr/local/go /usr/local/go
 
 RUN apk update &&\
     apk --no-cache add \
     sudo \
+    # gcc for cgo.
     g++ \
     gcc \
-    libc6-dev \
+    libc6-compat \
     make \
-    pkg-config &&\
+    pkgconfig &&\
     rm -rf /var/cache/apk/* &&\
     mkdir -p "$GOPATH/src" "$GOPATH/bin" &&\
     chmod -R 777 "$GOPATH" &&\
-    adduser gotenberg sudo &&\
-    echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers &&\
     # We cannot use $PATH in the next command (print $PATH instead of the environment variable value).
     sed -i 's#/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin#/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/go/bin:/usr/local/go/bin#g' /etc/sudoers &&\
     curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin $GOLANGCI_LINT_VERSION &&\
