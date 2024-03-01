@@ -22,7 +22,7 @@ if [ "$GOTENBERG_VERSION" == "edge" ]; then
     --platform linux/arm64 \
     --platform linux/386 \
     --platform linux/arm/v7 \
-    -t "$DOCKER_REPOSITORY/gotenberg:edge" \
+    -t "$DOCKER_REPOSITORY/gotenberg-alpine:edge" \
     --push \
     -f build/Dockerfile .
 
@@ -32,7 +32,7 @@ if [ "$GOTENBERG_VERSION" == "edge" ]; then
     --build-arg DOCKER_REPOSITORY="$DOCKER_REPOSITORY" \
     --build-arg GOTENBERG_VERSION="$GOTENBERG_VERSION" \
     --platform linux/amd64 \
-    -t "$DOCKER_REPOSITORY/gotenberg:edge-cloudrun" \
+    -t "$DOCKER_REPOSITORY/gotenberg-alpine:edge-cloudrun" \
     --push \
     -f build/Dockerfile.cloudrun .
 
@@ -59,10 +59,10 @@ docker buildx build \
   --platform linux/arm64 \
   --platform linux/386 \
   --platform linux/arm/v7 \
-  -t "$DOCKER_REPOSITORY/gotenberg:latest" \
-  -t "$DOCKER_REPOSITORY/gotenberg:${SEMVER[0]}" \
-  -t "$DOCKER_REPOSITORY/gotenberg:${SEMVER[0]}.${SEMVER[1]}" \
-  -t "$DOCKER_REPOSITORY/gotenberg:${SEMVER[0]}.${SEMVER[1]}.${SEMVER[2]}" \
+  -t "$DOCKER_REPOSITORY/gotenberg-alpine:latest" \
+  -t "$DOCKER_REPOSITORY/gotenberg-alpine:${SEMVER[0]}" \
+  -t "$DOCKER_REPOSITORY/gotenberg-alpine:${SEMVER[0]}.${SEMVER[1]}" \
+  -t "$DOCKER_REPOSITORY/gotenberg-alpine:${SEMVER[0]}.${SEMVER[1]}.${SEMVER[2]}" \
   --push \
   -f build/Dockerfile .
 
@@ -72,9 +72,9 @@ docker buildx build \
   --build-arg DOCKER_REPOSITORY="$DOCKER_REPOSITORY" \
   --build-arg GOTENBERG_VERSION="$GOTENBERG_VERSION" \
   --platform linux/amd64 \
-  -t "$DOCKER_REPOSITORY/gotenberg:latest-cloudrun" \
-  -t "$DOCKER_REPOSITORY/gotenberg:${SEMVER[0]}-cloudrun" \
-  -t "$DOCKER_REPOSITORY/gotenberg:${SEMVER[0]}.${SEMVER[1]}-cloudrun" \
-  -t "$DOCKER_REPOSITORY/gotenberg:${SEMVER[0]}.${SEMVER[1]}.${SEMVER[2]}-cloudrun" \
+  -t "$DOCKER_REPOSITORY/gotenberg-alpine:latest-cloudrun" \
+  -t "$DOCKER_REPOSITORY/gotenberg-alpine:${SEMVER[0]}-cloudrun" \
+  -t "$DOCKER_REPOSITORY/gotenberg-alpine:${SEMVER[0]}.${SEMVER[1]}-cloudrun" \
+  -t "$DOCKER_REPOSITORY/gotenberg-alpine:${SEMVER[0]}.${SEMVER[1]}.${SEMVER[2]}-cloudrun" \
   --push \
   -f build/Dockerfile.cloudrun .
