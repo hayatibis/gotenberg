@@ -7,7 +7,7 @@ it: build build-tests ## Initialize the development environment
 
 GOLANG_VERSION=1.21
 DOCKER_REPOSITORY=hayatibis
-GOTENBERG_VERSION=1.05
+GOTENBERG_VERSION=8.2.0
 GOTENBERG_USER_GID=1001
 GOTENBERG_USER_UID=1001
 NOTO_COLOR_EMOJI_VERSION=v2.042 # See https://github.com/googlefonts/noto-emoji/releases.

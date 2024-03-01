@@ -72,8 +72,8 @@ RUN apk --no-cache add chromium &&\
     rm -rf /var/cache/apk/*
 
 RUN apk --no-cache add libreoffice &&\
-    curl -Ls https://raw.githubusercontent.com/dagwieers/unoconv/master/unoconv -o /usr/local/bin/unoconv &&\
-    chmod +x /usr/local/bin/unoconv &&\
+    curl -Ls https://raw.githubusercontent.com/gotenberg/unoconverter/v0.0.1/unoconv -o /usr/bin/unoconverter &&\
+    chmod +x /usr/bin/unoconverter &&\
     # Verify installations.
     libreoffice --version &&\
     unoconverter --version &&\
