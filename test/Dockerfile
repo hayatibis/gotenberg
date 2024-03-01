@@ -43,4 +43,4 @@ COPY ./test/gotodos.sh /usr/bin/gotodos
 # Pristine working directory.
 WORKDIR /tests
 
-ENTRYPOINT [ "/usr/bin/tini", "--", "docker-entrypoint.sh" ]
+ENTRYPOINT [ "/sbin/tini", "--", "docker-entrypoint.sh" ]
