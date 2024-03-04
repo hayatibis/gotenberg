@@ -33,11 +33,11 @@ ARG PDFTK_VERSION
 ARG TMP_CHOMIUM_VERSION_ARMHF="116.0.5845.180-1~deb12u1"
 
 LABEL org.opencontainers.image.title="Gotenberg" \
-      org.opencontainers.image.description="A Docker-powered stateless API for PDF files. Alpine" \
-      org.opencontainers.image.version="$GOTENBERG_VERSION" \
-      org.opencontainers.image.authors="Hayati Ibis <hayati.ibis94@gmail.com>" \
-      org.opencontainers.image.documentation="https://gotenberg.dev" \
-      org.opencontainers.image.source="https://github.com/hayatibis/gotenberg-alpine"
+    org.opencontainers.image.description="A Docker-powered stateless API for PDF files. Alpine" \
+    org.opencontainers.image.version="$GOTENBERG_VERSION" \
+    org.opencontainers.image.authors="Hayati Ibis <hayati.ibis94@gmail.com>" \
+    org.opencontainers.image.documentation="https://gotenberg.dev" \
+    org.opencontainers.image.source="https://github.com/hayatibis/gotenberg-alpine"
 
 RUN \
     # Create a non-root user.
@@ -74,15 +74,13 @@ RUN apk --no-cache add \
     fc-cache -f &&\
     rm -rf /var/cache/apk/*
 
-RUN apk add font-wqy-zenhei --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing/
-
 RUN apk --no-cache add chromium &&\
     apk version chromium &&\
     rm -rf /var/cache/apk/*
 
 RUN apk --no-cache add libreoffice &&\
-    curl -Ls https://raw.githubusercontent.com/gotenberg/unoconverter/v0.0.1/unoconv -o /usr/bin/unoconverter &&\
-    chmod +x /usr/bin/unoconverter &&\
+    curl -Ls https://raw.githubusercontent.com/gotenberg/unoconverter/v0.0.1/unoconv -o /usr/local/bin/unoconverter &&\
+    chmod +x /usr/local/bin/unoconverter &&\
     # Verify installations.
     libreoffice --version &&\
     unoconverter --version &&\
@@ -116,8 +114,8 @@ COPY --from=binary-stage /home/gotenberg /usr/bin/
 # Environment variables required by modules or else.
 ENV CHROMIUM_BIN_PATH /usr/bin/chromium
 ENV LIBREOFFICE_BIN_PATH /usr/lib/libreoffice/program/soffice.bin
-ENV UNOCONVERTER_BIN_PATH /usr/bin/unoconverter
-ENV PDFTK_BIN_PATH /usr/bin/pdftk
+ENV UNOCONVERTER_BIN_PATH /usr/local/bin/unoconverter
+ENV PDFTK_BIN_PATH /usr/local/bin/pdftk
 ENV QPDF_BIN_PATH /usr/bin/qpdf
 
 USER gotenberg
