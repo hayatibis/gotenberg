@@ -79,7 +79,7 @@ WEBHOOK_DISABLE=false
 run: ## Start a Gotenberg container
 	docker run --rm -it \
 	-p $(API_PORT):$(API_PORT) \
-	$(DOCKER_REPOSITORY)/gotenberg:$(GOTENBERG_VERSION) \
+	$(DOCKER_REPOSITORY)/gotenberg-alpine:$(GOTENBERG_VERSION) \
 	gotenberg \
 	--gotenberg-graceful-shutdown-duration=$(GOTENBERG_GRACEFUL_SHUTDOWN_DURATION) \
 	--api-port=$(API_PORT) \
@@ -137,21 +137,21 @@ build-tests: ## Build the tests' Docker image
 	--build-arg DOCKER_REPOSITORY=$(DOCKER_REPOSITORY) \
 	--build-arg GOTENBERG_VERSION=$(GOTENBERG_VERSION) \
 	--build-arg GOLANGCI_LINT_VERSION=$(GOLANGCI_LINT_VERSION) \
-	-t $(DOCKER_REPOSITORY)/gotenberg:$(GOTENBERG_VERSION)-tests \
+	-t $(DOCKER_REPOSITORY)/gotenberg-alpine:$(GOTENBERG_VERSION)-tests \
 	-f test/Dockerfile .
 
 .PHONY: tests
 tests: ## Start the testing environment
 	docker run --rm -it \
 	-v $(PWD):/tests \
-	$(DOCKER_REPOSITORY)/gotenberg:$(GOTENBERG_VERSION)-tests \
+	$(DOCKER_REPOSITORY)/gotenberg-alpine:$(GOTENBERG_VERSION)-tests \
 	bash
 
 .PHONY: tests-once
 tests-once: ## Run the tests once (prefer the "tests" command while developing)
 	docker run --rm  \
 	-v $(PWD):/tests \
-	$(DOCKER_REPOSITORY)/gotenberg:$(GOTENBERG_VERSION)-tests \
+	$(DOCKER_REPOSITORY)/gotenberg-alpine:$(GOTENBERG_VERSION)-tests \
 	gotest
 
 # go install mvdan.cc/gofumpt@latest
