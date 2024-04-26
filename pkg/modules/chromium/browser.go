@@ -90,6 +90,8 @@ func (b *chromiumBrowser) Start(logger *zap.Logger) error {
 		// https://github.com/puppeteer/puppeteer/issues/2410
 		chromedp.Flag("font-render-hinting", "none"),
 		chromedp.UserDataDir(b.userProfileDirPath),
+		// See https://github.com/gotenberg/gotenberg/issues/831.
+		chromedp.Flag("disable-pdf-tagging", true),
 	)
 
 	if b.arguments.incognito {
@@ -164,7 +166,7 @@ func (b *chromiumBrowser) Stop(logger *zap.Logger) error {
 		go func() {
 			// FIXME: Chromium seems to recreate the user profile directory
 			//  right after its deletion if we do not wait a certain amount
-			//  of time before re-deleting it.
+			//  of time before deleting it.
 			<-time.After(10 * time.Second)
 
 			err := os.RemoveAll(userProfileDirPath)
@@ -224,6 +226,7 @@ func (b *chromiumBrowser) pdf(ctx context.Context, logger *zap.Logger, url, outp
 		clearCacheActionFunc(logger, b.arguments.clearCache),
 		clearCookiesActionFunc(logger, b.arguments.clearCookies),
 		disableJavaScriptActionFunc(logger, b.arguments.disableJavaScript),
+		setCookiesActionFunc(logger, options.Cookies),
 		extraHttpHeadersActionFunc(logger, options.ExtraHttpHeaders),
 		navigateActionFunc(logger, url, options.SkipNetworkIdleEvent),
 		hideDefaultWhiteBackgroundActionFunc(logger, options.OmitBackground, options.PrintBackground),
@@ -246,6 +249,7 @@ func (b *chromiumBrowser) screenshot(ctx context.Context, logger *zap.Logger, ur
 		clearCacheActionFunc(logger, b.arguments.clearCache),
 		clearCookiesActionFunc(logger, b.arguments.clearCookies),
 		disableJavaScriptActionFunc(logger, b.arguments.disableJavaScript),
+		setCookiesActionFunc(logger, options.Cookies),
 		extraHttpHeadersActionFunc(logger, options.ExtraHttpHeaders),
 		navigateActionFunc(logger, url, options.SkipNetworkIdleEvent),
 		hideDefaultWhiteBackgroundActionFunc(logger, options.OmitBackground, true),
@@ -254,6 +258,7 @@ func (b *chromiumBrowser) screenshot(ctx context.Context, logger *zap.Logger, ur
 		waitDelayBeforePrintActionFunc(logger, b.arguments.disableJavaScript, options.WaitDelay),
 		waitForExpressionBeforePrintActionFunc(logger, b.arguments.disableJavaScript, options.WaitForExpression),
 		// Screenshot specific.
+		setDeviceMetricsOverride(logger, options.Width, options.Height),
 		captureScreenshotActionFunc(logger, outputPath, options),
 	})
 }

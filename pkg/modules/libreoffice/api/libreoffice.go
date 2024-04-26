@@ -273,6 +273,14 @@ func (p *libreOfficeProcess) pdf(ctx context.Context, logger *zap.Logger, inputP
 		args = append(args, "--export", fmt.Sprintf("PageRange=%s", options.PageRanges))
 	}
 
+	if !options.ExportFormFields {
+		args = append(args, "--export", "ExportFormFields=false")
+	}
+
+	if options.SinglePageSheets {
+		args = append(args, "--export", "SinglePageSheets=true")
+	}
+
 	switch options.PdfFormats.PdfA {
 	case "":
 	case gotenberg.PdfA1b:
@@ -288,8 +296,14 @@ func (p *libreOfficeProcess) pdf(ctx context.Context, logger *zap.Logger, inputP
 	if options.PdfFormats.PdfUa {
 		args = append(
 			args,
-			"--export", "EnableTextAccessForAccessibilityTools=true",
 			"--export", "UseTaggedPDF=true",
+			"--export", "EnableTextAccessForAccessibilityTools=true",
+		)
+	} else {
+		args = append(
+			args,
+			"--export", "UseTaggedPDF=false",
+			"--export", "EnableTextAccessForAccessibilityTools=false",
 		)
 	}
 

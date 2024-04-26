@@ -89,16 +89,19 @@ RUN apk --no-cache add libreoffice &&\
 
 
 RUN \
-    # Install PDFtk & QPDF (PDF engines).
+    # Install PDFtk, QPDF & ExifTool (PDF engines).
     # See https://github.com/gotenberg/gotenberg/pull/273.
     curl -o /usr/local/bin/pdftk.jar "https://gitlab.com/api/v4/projects/5024297/packages/generic/pdftk-java/$PDFTK_VERSION/pdftk-all.jar" &&\
     chmod 775 /usr/local/bin/pdftk.jar &&\
     echo '#!/usr/bin/bash\n\n java -jar "$0.jar" "$@"' > /usr/local/bin/pdftk && \
     chmod 775 /usr/local/bin/pdftk &&\
-    apk --no-cache add qpdf &&\
+    apk --no-cache add qpdf exiftool&&\
+    # See https://github.com/nextcloud/docker/issues/380.
+    mkdir -p /usr/share/man/man1 &&\
     # Verify installations.
-    # pdftk --version &&\
-    # qpdf --version &&\
+    pdftk --version &&\
+    qpdf --version &&\
+    exiftool --version &&\
     # Cleanup.
     rm -rf /var/cache/apk/*
 
@@ -117,6 +120,7 @@ ENV LIBREOFFICE_BIN_PATH /usr/lib/libreoffice/program/soffice.bin
 ENV UNOCONVERTER_BIN_PATH /usr/local/bin/unoconverter
 ENV PDFTK_BIN_PATH /usr/local/bin/pdftk
 ENV QPDF_BIN_PATH /usr/bin/qpdf
+ENV EXIFTOOL_BIN_PATH /usr/bin/exiftool
 
 USER gotenberg
 WORKDIR /home/gotenberg
