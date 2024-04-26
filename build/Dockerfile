@@ -47,7 +47,14 @@ RUN \
     mkdir -p /home/gotenberg && \
     chown gotenberg:gotenberg /home/gotenberg
 
-RUN apk update && apk --no-cache add curl bash htop tini openjdk8-jre-base bash python3 &&\
+RUN apk update && apk --no-cache add \
+    curl \
+    bash \
+    htop \
+    tini \
+    openjdk8-jre-base \
+    bash \
+    python3 &&\
     rm -rf /var/cache/apk/*
 
 # Fonts
@@ -69,7 +76,8 @@ RUN apk --no-cache add \
     font-inconsolata \
     font-mononoki \
     font-freefont \
-    msttcorefonts-installer fontconfig &&\
+    msttcorefonts-installer \
+    fontconfig &&\
     update-ms-fonts && \
     fc-cache -f &&\
     rm -rf /var/cache/apk/*
