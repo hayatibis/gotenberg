@@ -20,6 +20,7 @@ COPY --from=golang /usr/local/go /usr/local/go
 RUN apk update &&\
     apk --no-cache add \
     sudo \
+    shadow \
     # gcc for cgo.
     g++ \
     gcc \

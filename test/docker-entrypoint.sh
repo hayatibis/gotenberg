@@ -35,6 +35,11 @@ unset HAS_CONSISTENT_RIGHTS
 # Note: DOCKER_USER is either a username (if the user exists in the container),
 # otherwise a user ID (a user from the host).
 
+# Ensure the sudo group exists
+if ! getent group sudo > /dev/null; then
+    groupadd sudo
+fi
+
 # DOCKER_USER is an ID.
 if [[ "$DOCKER_USER" =~ ^[0-9]+$ ]] ; then
     # Let's change the gotenberg user's ID in order to match this free ID.
@@ -46,7 +51,7 @@ DOCKER_USER_ID=$(id -ur $DOCKER_USER)
 
 # Fix access rights to stdout and stderr.
 set +e
-chown $DOCKER_USER /proc/self/fd/{1,2}
+chown $DOCKER_USER /proc/$$/fd/{1,2}
 set -e
 
 # Install modules.
