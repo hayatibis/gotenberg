@@ -249,6 +249,7 @@ func TestChromiumBrowser_pdf(t *testing.T) {
 		browser            browser
 		fs                 *gotenberg.FileSystem
 		options            PdfOptions
+		url                string
 		noDeadline         bool
 		start              bool
 		expectError        bool
@@ -479,6 +480,32 @@ func TestChromiumBrowser_pdf(t *testing.T) {
 			expectedError: ErrConsoleExceptions,
 		},
 		{
+			scenario: "ErrConnectionRefused",
+			browser: newChromiumBrowser(
+				browserArguments{
+					binPath:          os.Getenv("CHROMIUM_BIN_PATH"),
+					wsUrlReadTimeout: 5 * time.Second,
+					allowList:        regexp2.MustCompile("", 0),
+					denyList:         regexp2.MustCompile("", 0),
+				},
+			),
+			fs: func() *gotenberg.FileSystem {
+				fs := gotenberg.NewFileSystem()
+
+				err := os.MkdirAll(fs.WorkingDirPath(), 0o755)
+				if err != nil {
+					t.Fatalf(fmt.Sprintf("expected no error but got: %v", err))
+				}
+
+				return fs
+			}(),
+			url:           "http://localhost:100",
+			noDeadline:    false,
+			start:         true,
+			expectError:   true,
+			expectedError: ErrConnectionRefused,
+		},
+		{
 			scenario: "clear cache",
 			browser: newChromiumBrowser(
 				browserArguments{
@@ -612,6 +639,41 @@ func TestChromiumBrowser_pdf(t *testing.T) {
 			expectError: false,
 			expectedLogEntries: []string{
 				"set cookie",
+			},
+		},
+		{
+			scenario: "user agent override",
+			browser: newChromiumBrowser(
+				browserArguments{
+					binPath:          os.Getenv("CHROMIUM_BIN_PATH"),
+					wsUrlReadTimeout: 5 * time.Second,
+					allowList:        regexp2.MustCompile("", 0),
+					denyList:         regexp2.MustCompile("", 0),
+				},
+			),
+			fs: func() *gotenberg.FileSystem {
+				fs := gotenberg.NewFileSystem()
+
+				err := os.MkdirAll(fs.WorkingDirPath(), 0o755)
+				if err != nil {
+					t.Fatalf(fmt.Sprintf("expected no error but got: %v", err))
+				}
+
+				err = os.WriteFile(fmt.Sprintf("%s/index.html", fs.WorkingDirPath()), []byte("<h1>User-Agent override</h1>"), 0o755)
+				if err != nil {
+					t.Fatalf("expected no error but got: %v", err)
+				}
+
+				return fs
+			}(),
+			options: PdfOptions{
+				Options: Options{UserAgent: "foo"},
+			},
+			noDeadline:  false,
+			start:       true,
+			expectError: false,
+			expectedLogEntries: []string{
+				fmt.Sprintf("user agent override: foo"),
 			},
 		},
 		{
@@ -1208,10 +1270,15 @@ func TestChromiumBrowser_pdf(t *testing.T) {
 				defer cancel()
 			}
 
+			url := fmt.Sprintf("file://%s/index.html", tc.fs.WorkingDirPath())
+			if tc.url != "" {
+				url = tc.url
+			}
+
 			err := tc.browser.pdf(
 				ctx,
 				logger,
-				fmt.Sprintf("file://%s/index.html", tc.fs.WorkingDirPath()),
+				url,
 				fmt.Sprintf("%s/%s.pdf", tc.fs.WorkingDirPath(), uuid.NewString()),
 				tc.options,
 			)
@@ -1251,6 +1318,7 @@ func TestChromiumBrowser_screenshot(t *testing.T) {
 		browser            browser
 		fs                 *gotenberg.FileSystem
 		options            ScreenshotOptions
+		url                string
 		noDeadline         bool
 		start              bool
 		expectError        bool
@@ -1483,6 +1551,33 @@ func TestChromiumBrowser_screenshot(t *testing.T) {
 			start:         true,
 			expectError:   true,
 			expectedError: ErrConsoleExceptions,
+		},
+		{
+			scenario: "ErrConnectionRefused",
+			browser: newChromiumBrowser(
+				browserArguments{
+					binPath:          os.Getenv("CHROMIUM_BIN_PATH"),
+					wsUrlReadTimeout: 5 * time.Second,
+					allowList:        regexp2.MustCompile("", 0),
+					denyList:         regexp2.MustCompile("", 0),
+				},
+			),
+
+			fs: func() *gotenberg.FileSystem {
+				fs := gotenberg.NewFileSystem()
+
+				err := os.MkdirAll(fs.WorkingDirPath(), 0o755)
+				if err != nil {
+					t.Fatalf(fmt.Sprintf("expected no error but got: %v", err))
+				}
+
+				return fs
+			}(),
+			url:           "http://localhost:100",
+			noDeadline:    false,
+			start:         true,
+			expectError:   true,
+			expectedError: ErrConnectionRefused,
 		},
 		{
 			scenario: "clear cache",
@@ -1990,6 +2085,7 @@ func TestChromiumBrowser_screenshot(t *testing.T) {
 				"cache not cleared",
 				"cookies not cleared",
 				"JavaScript not disabled",
+				"no user agent override",
 				"no extra HTTP headers",
 				"navigate to",
 				"default white background not hidden",
@@ -2037,6 +2133,7 @@ func TestChromiumBrowser_screenshot(t *testing.T) {
 				"cookies not cleared",
 				"JavaScript not disabled",
 				"no cookies to set",
+				"no user agent override",
 				"no extra HTTP headers",
 				"navigate to",
 				"default white background not hidden",
@@ -2084,6 +2181,7 @@ func TestChromiumBrowser_screenshot(t *testing.T) {
 				"cookies not cleared",
 				"JavaScript not disabled",
 				"no cookies to set",
+				"no user agent override",
 				"no extra HTTP headers",
 				"navigate to",
 				"default white background not hidden",
@@ -2131,10 +2229,15 @@ func TestChromiumBrowser_screenshot(t *testing.T) {
 				defer cancel()
 			}
 
+			url := fmt.Sprintf("file://%s/index.html", tc.fs.WorkingDirPath())
+			if tc.url != "" {
+				url = tc.url
+			}
+
 			err := tc.browser.screenshot(
 				ctx,
 				logger,
-				fmt.Sprintf("file://%s/index.html", tc.fs.WorkingDirPath()),
+				url,
 				fmt.Sprintf("%s/%s.pdf", tc.fs.WorkingDirPath(), uuid.NewString()),
 				tc.options,
 			)

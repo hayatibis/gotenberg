@@ -227,6 +227,7 @@ func (b *chromiumBrowser) pdf(ctx context.Context, logger *zap.Logger, url, outp
 		clearCookiesActionFunc(logger, b.arguments.clearCookies),
 		disableJavaScriptActionFunc(logger, b.arguments.disableJavaScript),
 		setCookiesActionFunc(logger, options.Cookies),
+		userAgentOverride(logger, options.UserAgent),
 		extraHttpHeadersActionFunc(logger, options.ExtraHttpHeaders),
 		navigateActionFunc(logger, url, options.SkipNetworkIdleEvent),
 		hideDefaultWhiteBackgroundActionFunc(logger, options.OmitBackground, options.PrintBackground),
@@ -250,6 +251,7 @@ func (b *chromiumBrowser) screenshot(ctx context.Context, logger *zap.Logger, ur
 		clearCookiesActionFunc(logger, b.arguments.clearCookies),
 		disableJavaScriptActionFunc(logger, b.arguments.disableJavaScript),
 		setCookiesActionFunc(logger, options.Cookies),
+		userAgentOverride(logger, options.UserAgent),
 		extraHttpHeadersActionFunc(logger, options.ExtraHttpHeaders),
 		navigateActionFunc(logger, url, options.SkipNetworkIdleEvent),
 		hideDefaultWhiteBackgroundActionFunc(logger, options.OmitBackground, true),
@@ -312,6 +314,14 @@ func (b *chromiumBrowser) do(ctx context.Context, logger *zap.Logger, url string
 		listenForEventExceptionThrown(taskCtx, logger, &consoleExceptions, &consoleExceptionsMu)
 	}
 
+	var (
+		connectionRefused   error
+		connectionRefusedMu sync.RWMutex
+	)
+
+	// See https://github.com/gotenberg/gotenberg/issues/913.
+	listenForEventLoadingFailedOnConnectionRefused(taskCtx, logger, &connectionRefused, &connectionRefusedMu)
+
 	err = chromedp.Run(taskCtx, tasks...)
 	if err != nil {
 		errMessage := err.Error()
@@ -345,6 +355,14 @@ func (b *chromiumBrowser) do(ctx context.Context, logger *zap.Logger, url string
 
 	if consoleExceptions != nil {
 		return fmt.Errorf("%v: %w", consoleExceptions, ErrConsoleExceptions)
+	}
+
+	// See https://github.com/gotenberg/gotenberg/issues/913.
+	connectionRefusedMu.RLock()
+	defer connectionRefusedMu.RUnlock()
+
+	if connectionRefused != nil {
+		return fmt.Errorf("%v: %w", connectionRefused, ErrConnectionRefused)
 	}
 
 	return nil

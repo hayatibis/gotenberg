@@ -42,6 +42,9 @@ var (
 	// is set to true.
 	ErrConsoleExceptions = errors.New("console exceptions")
 
+	// ErrConnectionRefused happens when a URL cannot be reached.
+	ErrConnectionRefused = errors.New("connection refused")
+
 	// PDF specific.
 
 	// ErrOmitBackgroundWithoutPrintBackground happens if
@@ -76,51 +79,44 @@ type Options struct {
 	// "networkIdle" event, drastically improving the conversion speed. It may
 	// not be suitable for all HTML documents, as some may not be fully
 	// rendered until this event is fired.
-	// Optional.
 	SkipNetworkIdleEvent bool
 
 	// FailOnHttpStatusCodes sets if the conversion should fail if the status
 	// code from the main page matches with one of its entries.
-	// Optional.
 	FailOnHttpStatusCodes []int64
 
 	// FailOnConsoleExceptions sets if the conversion should fail if there are
 	// exceptions in the Chromium console.
-	// Optional.
 	FailOnConsoleExceptions bool
 
 	// WaitDelay is the duration to wait when loading an HTML document before
 	// converting it.
-	// Optional.
 	WaitDelay time.Duration
 
 	// WaitWindowStatus is the window.status value to wait for before
 	// converting an HTML document.
-	// Optional.
 	WaitWindowStatus string
 
 	// WaitForExpression is the custom JavaScript expression to wait before
 	// converting an HTML document until it returns true
-	// Optional.
 	WaitForExpression string
 
 	// Cookies are the cookies to put in the Chromium cookies' jar.
-	// Optional
 	Cookies []Cookie
 
-	// ExtraHttpHeaders are the HTTP headers to send by Chromium while loading
-	// the HTML document.
-	// Optional.
+	// UserAgent overrides the default 'User-Agent' HTTP header.
+	UserAgent string
+
+	// ExtraHttpHeaders are extra HTTP headers to send by Chromium while
+	// loading he HTML document.
 	ExtraHttpHeaders map[string]string
 
 	// EmulatedMediaType is the media type to emulate, either "screen" or
 	// "print".
-	// Optional.
 	EmulatedMediaType string
 
 	// OmitBackground hides default white background and allows generating PDFs
 	// with transparency.
-	// Optional.
 	OmitBackground bool
 }
 
@@ -134,6 +130,7 @@ func DefaultOptions() Options {
 		WaitWindowStatus:        "",
 		WaitForExpression:       "",
 		Cookies:                 nil,
+		UserAgent:               "",
 		ExtraHttpHeaders:        nil,
 		EmulatedMediaType:       "",
 		OmitBackground:          false,
@@ -145,48 +142,37 @@ type PdfOptions struct {
 	Options
 
 	// Landscape sets the paper orientation.
-	// Optional.
 	Landscape bool
 
 	// PrintBackground prints the background graphics.
-	// Optional.
 	PrintBackground bool
 
 	// Scale is the scale of the page rendering.
-	// Optional.
 	Scale float64
 
 	// SinglePage defines whether to print the entire content in one single
 	// page.
-	// Optional.
 	SinglePage bool
 
 	// PaperWidth is the paper width, in inches.
-	// Optional.
 	PaperWidth float64
 
 	// PaperHeight is the paper height, in inches.
-	// Optional.
 	PaperHeight float64
 
 	// MarginTop is the top margin, in inches.
-	// Optional.
 	MarginTop float64
 
 	// MarginBottom is the bottom margin, in inches.
-	// Optional.
 	MarginBottom float64
 
 	// MarginLeft is the left margin, in inches.
-	// Optional.
 	MarginLeft float64
 
 	// MarginRight is the right margin, in inches.
-	// Optional.
 	MarginRight float64
 
 	// Page ranges to print, e.g., '1-5, 8, 11-13'. Empty means all pages.
-	// Optional.
 	PageRanges string
 
 	// HeaderTemplate is the HTML template of the header. It should be valid
@@ -199,17 +185,14 @@ type PdfOptions struct {
 	// - totalPages: total pages in the document
 	// For example, <span class=title></span> would generate span containing
 	// the title.
-	// Optional.
 	HeaderTemplate string
 
 	// FooterTemplate is the HTML template of the footer. It should use the
 	// same format as the HeaderTemplate.
-	// Optional.
 	FooterTemplate string
 
 	// PreferCssPageSize defines whether to prefer page size as defined by CSS.
 	// If false, the content will be scaled to fit the paper size.
-	// Optional.
 	PreferCssPageSize bool
 }
 
@@ -240,30 +223,24 @@ type ScreenshotOptions struct {
 	Options
 
 	// Width is the device screen width in pixels.
-	// Optional.
 	Width int
 
 	// Height is the device screen height in pixels.
-	// Optional.
 	Height int
 
 	// Clip defines whether to clip the screenshot according to the device
 	// dimensions.
-	// Optional.
 	Clip bool
 
 	// Format is the image compression format, either "png" or "jpeg" or
 	// "webp".
-	// Optional.
 	Format string
 
 	// Quality is the compression quality from range [0..100] (jpeg only).
-	// Optional.
 	Quality int
 
 	// OptimizeForSpeed defines whether to optimize image encoding for speed,
 	// not for resulting size.
-	// Optional.
 	OptimizeForSpeed bool
 }
 
