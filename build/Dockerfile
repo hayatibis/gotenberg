@@ -101,9 +101,9 @@ RUN \
     # See https://github.com/gotenberg/gotenberg/pull/273.
     curl -o /usr/local/bin/pdftk.jar "https://gitlab.com/api/v4/projects/5024297/packages/generic/pdftk-java/$PDFTK_VERSION/pdftk-all.jar" &&\
     chmod 775 /usr/local/bin/pdftk.jar &&\
-    echo '#!/usr/bin/bash\n\n java -jar "$0.jar" "$@"' > /usr/local/bin/pdftk && \
+    echo -e '#!/usr/bin/env bash\n\njava -jar /usr/local/bin/pdftk.jar "$@"' > /usr/local/bin/pdftk &&\
     chmod 775 /usr/local/bin/pdftk &&\
-    apk --no-cache add qpdf exiftool&&\
+    apk --no-cache add qpdf exiftool &&\
     # See https://github.com/nextcloud/docker/issues/380.
     mkdir -p /usr/share/man/man1 &&\
     # Verify installations.

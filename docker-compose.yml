@@ -1,0 +1,42 @@
+services:
+  gotenberg:
+    container_name: gotenberg
+    image: hayatibis/gotenberg-alpine:8.8.0
+    command:
+      - "gotenberg"
+      - "--chromium-disable-routes"
+      - "true"
+      - "--pdfengines-disable-routes"
+      - "true"
+      - "--api-timeout"
+      - "300s"
+      - "--libreoffice-auto-start"
+      - "true"
+      - "--webhook-disable"
+      - "true"
+      - "--api-disable-health-check-logging"
+      - "true"
+      - "--log-level"
+      - "debug"
+      - "--api-port"
+      - "9099"
+    ports:
+      - "9099:9099"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl --silent --fail  -w '%{http_code}' http://gotenberg:9099/health | grep 200"
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: on-failure
+    deploy:
+      resources:
+        limits:
+          cpus: '0.7'
+          memory: 1G
+        reservations:
+          cpus: '0.3'
+          memory: 128M
