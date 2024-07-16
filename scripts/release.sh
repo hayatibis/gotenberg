@@ -10,7 +10,7 @@ NOTO_COLOR_EMOJI_VERSION="$5"
 PDFTK_VERSION="$6"
 DOCKER_REPOSITORY="$7"
 
-if [ "$GOTENBERG_VERSION" == "8.2.0" ]; then
+if [ "$GOTENBERG_VERSION" == "8.8.0" ]; then
   docker buildx build \
     --build-arg GOLANG_VERSION="$GOLANG_VERSION" \
     --build-arg GOTENBERG_VERSION="$GOTENBERG_VERSION" \
@@ -22,7 +22,7 @@ if [ "$GOTENBERG_VERSION" == "8.2.0" ]; then
     --platform linux/arm64 \
     --platform linux/386 \
     --platform linux/arm/v7 \
-    -t "$DOCKER_REPOSITORY/gotenberg-alpine:8.2.0" \
+    -t "$DOCKER_REPOSITORY/gotenberg-alpine:8.8.0" \
     --push \
     -f build/Dockerfile .
 
@@ -32,7 +32,7 @@ if [ "$GOTENBERG_VERSION" == "8.2.0" ]; then
     --build-arg DOCKER_REPOSITORY="$DOCKER_REPOSITORY" \
     --build-arg GOTENBERG_VERSION="$GOTENBERG_VERSION" \
     --platform linux/amd64 \
-    -t "$DOCKER_REPOSITORY/gotenberg-alpine:8.2.0-cloudrun" \
+    -t "$DOCKER_REPOSITORY/gotenberg-alpine:8.8.0-cloudrun" \
     --push \
     -f build/Dockerfile.cloudrun .
 
